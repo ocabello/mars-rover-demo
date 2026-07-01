@@ -3,6 +3,10 @@
 
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
+  const GAME_WIDTH = 800;
+  const GAME_HEIGHT = 480;
+  canvas.width = GAME_WIDTH;
+  canvas.height = GAME_HEIGHT;
   ctx.imageSmoothingEnabled = false;
   const overlay = document.getElementById('overlay');
   const overlayContent = document.getElementById('overlay-content');

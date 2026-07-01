@@ -171,10 +171,6 @@
   connectBtn.addEventListener('click', connectMedia);
   startGameBtn.addEventListener('click', launchGame);
 
-  GameAudio.startIntroLoop();
-  introApp.addEventListener('pointerdown', () => GameAudio.startIntroLoop());
-  introApp.addEventListener('keydown', () => GameAudio.startIntroLoop());
-
   if (!isSecureContext()) {
     setStatus('Open this page via http://localhost — not as a file — to use the camera.', true);
   }

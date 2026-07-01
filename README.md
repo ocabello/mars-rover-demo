@@ -5,10 +5,12 @@ A browser-based Mars rover platformer with a **human verification intro** (wave 
 ## Quick start
 
 ```bash
-python3 -m http.server 8080
+python3 server.py --port 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080) — **required** for camera/mic access.
+Open [http://localhost:8080](http://localhost:8080) — **required** for camera/mic access. The bundled `server.py` sets iframe-friendly headers (`frame-ancestors *`; no `X-Frame-Options`).
+
+For iframe embeds, replace the `GAME_TITLE`, `ONE_LINE_PITCH`, and `GAME_URL` placeholders in `index.html` and add `cover-1200x630.png` at the site root.
 
 1. Complete the human check (connect → wave → pew pew → approved)
 2. Click **START MISSION** to begin the rover game

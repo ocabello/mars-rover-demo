@@ -19,8 +19,30 @@ const GameAudio = (function () {
   let introAudio = null;
   let introStopped = false;
 
+  function applyMuteState(audio) {
+    audio.muted = !unlocked;
+    return audio;
+  }
+
   function unlock() {
+    if (unlocked) return;
     unlocked = true;
+    if (introAudio) {
+      introAudio.muted = false;
+    }
+  }
+
+  function bindInteractionUnlock() {
+    const onActivate = () => {
+      unlock();
+      if (!introStopped) {
+        startIntroLoop();
+      }
+    };
+
+    ['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
+      document.addEventListener(eventName, onActivate, { once: true, capture: true });
+    });
   }
 
   function ensureIntroAudio() {
@@ -28,6 +50,7 @@ const GameAudio = (function () {
       introAudio = new Audio(SOUNDS.intro);
       introAudio.loop = true;
       introAudio.preload = 'auto';
+      applyMuteState(introAudio);
       introAudio.addEventListener('error', () => {
         console.warn(`[Ark-3] Missing sound file for "intro": ${SOUNDS.intro}`);
       }, { once: true });
@@ -36,9 +59,9 @@ const GameAudio = (function () {
   }
 
   function startIntroLoop() {
-    if (introStopped) return;
-    unlock();
+    if (introStopped || !unlocked) return;
     const audio = ensureIntroAudio();
+    audio.muted = false;
     audio.play().catch((err) => {
       console.warn('[Ark-3] Intro loop blocked until interaction:', err.message);
     });
@@ -50,8 +73,9 @@ const GameAudio = (function () {
   }
 
   function resumeIntroLoop() {
-    if (introStopped) return;
+    if (introStopped || !unlocked) return;
     const audio = ensureIntroAudio();
+    audio.muted = false;
     audio.play().catch((err) => {
       console.warn('[Ark-3] Could not resume intro loop:', err.message);
     });
@@ -65,15 +89,16 @@ const GameAudio = (function () {
   }
 
   function play(key) {
+    if (!unlocked) return;
+
     const src = SOUNDS[key];
     if (!src) {
       console.warn(`[Ark-3] Unknown sound key: ${key}`);
       return;
     }
-    const audio = new Audio(src);
+    const audio = applyMuteState(new Audio(src));
     audio.volume = 1;
     audio.play().catch((err) => {
-      if (!unlocked) return;
       console.warn(`[Ark-3] Could not play "${key}" (${src}):`, err.message);
     });
   }
@@ -82,7 +107,7 @@ const GameAudio = (function () {
     ensureIntroAudio();
     Object.entries(SOUNDS).forEach(([key, src]) => {
       if (key === 'intro') return;
-      const probe = new Audio();
+      const probe = applyMuteState(new Audio());
       probe.preload = 'auto';
       probe.src = src;
       probe.addEventListener('error', () => {
@@ -91,6 +116,7 @@ const GameAudio = (function () {
     });
   }
 
+  bindInteractionUnlock();
   preload();
 
   return {

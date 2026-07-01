@@ -493,6 +493,7 @@
     if (state !== 'playing' || invincibleTimer > 0) return;
 
     if (reason === 'alien') GameAudio.play('alien');
+    else if (reason === 'asteroid') GameAudio.play('asteroidHit');
     else if (reason === 'crater' || reason === 'fall') GameAudio.play('crater');
 
     showDamageMessage(DAMAGE_MESSAGES[reason]);

@@ -11,6 +11,7 @@ const GameAudio = (function () {
     alien: 'assets/audio/Obstacle_alien.ogg',
     crater: 'assets/audio/Obstacle_crater.ogg',
     asteroid: 'assets/audio/Obstacle_asteroid.ogg',
+    asteroidHit: 'assets/audio/Asteroid_fail.ogg',
     gameOver: 'assets/audio/mission_failed.ogg',
     winning: 'assets/audio/mission_completed.ogg',
   };

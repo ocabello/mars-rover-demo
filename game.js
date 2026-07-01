@@ -8,6 +8,27 @@
   canvas.width = GAME_WIDTH;
   canvas.height = GAME_HEIGHT;
   ctx.imageSmoothingEnabled = false;
+
+  function fitCanvasDisplay() {
+    const stage = canvas.closest('.game-stage');
+    if (!stage) return;
+    const availW = stage.clientWidth;
+    const availH = stage.clientHeight;
+    if (availW <= 0 || availH <= 0) return;
+    const scale = Math.min(availW / GAME_WIDTH, availH / GAME_HEIGHT);
+    canvas.style.width = `${Math.floor(GAME_WIDTH * scale)}px`;
+    canvas.style.height = `${Math.floor(GAME_HEIGHT * scale)}px`;
+  }
+
+  const stageEl = canvas.closest('.game-stage');
+  if (stageEl) {
+    fitCanvasDisplay();
+    new ResizeObserver(fitCanvasDisplay).observe(stageEl);
+    window.addEventListener('resize', fitCanvasDisplay);
+    document.addEventListener('ark3:start-game', () => {
+      requestAnimationFrame(fitCanvasDisplay);
+    });
+  }
   const overlay = document.getElementById('overlay');
   const overlayContent = document.getElementById('overlay-content');
   const damageMessageEl = document.getElementById('damage-message');

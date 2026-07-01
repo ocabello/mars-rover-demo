@@ -1,9 +1,7 @@
 /* Level progression — starts easy (tutorial) and ramps gradually via LEVEL_CONFIG. */
 
-const SCREEN_WIDTH =
-  typeof document !== 'undefined'
-    ? document.getElementById('game-canvas')?.width || 800
-    : 800;
+/* Level layout uses a fixed logical width — must match game.js GAME_WIDTH (800). */
+const SCREEN_WIDTH = 800;
 
 const FLOOR_Y = 440;
 const PLATFORM_H = 40;

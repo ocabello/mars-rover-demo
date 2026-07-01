@@ -410,12 +410,21 @@ const GameAssets = (function () {
     const img = images.levelBackground;
     if (!img) return false;
 
-    const scale = Math.max(canvasW / img.width, canvasH / img.height);
-    const drawW = img.width * scale;
-    const drawH = img.height * scale;
-    const x = (canvasW - drawW) / 2;
-    const y = (canvasH - drawH) / 2;
-    ctx.drawImage(img, x, y, drawW, drawH);
+    if (!drawLevelBackground.cache) {
+      const cache = document.createElement('canvas');
+      cache.width = canvasW;
+      cache.height = canvasH;
+      const c = cache.getContext('2d');
+      const scale = Math.max(canvasW / img.width, canvasH / img.height);
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const x = (canvasW - drawW) / 2;
+      const y = (canvasH - drawH) / 2;
+      c.drawImage(img, x, y, drawW, drawH);
+      drawLevelBackground.cache = cache;
+    }
+
+    ctx.drawImage(drawLevelBackground.cache, 0, 0);
     return true;
   }
 

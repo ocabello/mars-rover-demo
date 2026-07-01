@@ -60,6 +60,7 @@
   const INVINCIBLE_FRAMES = 90;
   const CAMERA_LEAD = 0.35;
   const CAMERA_SMOOTH = 0.12;
+  const TARGET_FRAME_MS = 1000 / 60;
 
   const FLOOR_Y = 440;
   const COLLECT_FLOAT_Y = 422;
@@ -282,45 +283,45 @@
     createRedSparks(player.x + player.w / 2, player.y + player.h / 2, 16);
   }
 
-  function updateFeedback() {
-    if (feedback.goodTimer > 0) feedback.goodTimer--;
-    if (feedback.badTimer > 0) feedback.badTimer--;
-    if (feedback.goodBgFlash > 0) feedback.goodBgFlash--;
-    if (feedback.badBgFlash > 0) feedback.badBgFlash--;
-    if (feedback.badSkyPulse > 0) feedback.badSkyPulse--;
-    if (feedback.roverGlow > 0) feedback.roverGlow--;
-    if (feedback.roverShake > 0) feedback.roverShake--;
+  function updateFeedback(dt) {
+    if (feedback.goodTimer > 0) feedback.goodTimer -= dt;
+    if (feedback.badTimer > 0) feedback.badTimer -= dt;
+    if (feedback.goodBgFlash > 0) feedback.goodBgFlash -= dt;
+    if (feedback.badBgFlash > 0) feedback.badBgFlash -= dt;
+    if (feedback.badSkyPulse > 0) feedback.badSkyPulse -= dt;
+    if (feedback.roverGlow > 0) feedback.roverGlow -= dt;
+    if (feedback.roverShake > 0) feedback.roverShake -= dt;
 
     for (let i = feedback.particles.length - 1; i >= 0; i--) {
       const p = feedback.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.kind === 'redSpark' || p.kind === 'debris' ? 0.25 : 0.1;
-      p.life--;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += (p.kind === 'redSpark' || p.kind === 'debris' ? 0.25 : 0.1) * dt;
+      p.life -= dt;
       if (p.life <= 0) feedback.particles.splice(i, 1);
     }
 
     for (let i = feedback.burstStars.length - 1; i >= 0; i--) {
       const s = feedback.burstStars[i];
-      s.life--;
+      s.life -= dt;
       if (s.life <= 0) feedback.burstStars.splice(i, 1);
     }
 
     for (let i = feedback.collectBursts.length - 1; i >= 0; i--) {
-      feedback.collectBursts[i].timer--;
+      feedback.collectBursts[i].timer -= dt;
       if (feedback.collectBursts[i].timer <= 0) feedback.collectBursts.splice(i, 1);
     }
 
     for (let i = feedback.scorePopups.length - 1; i >= 0; i--) {
       const popup = feedback.scorePopups[i];
-      popup.y += popup.vy;
-      popup.vy *= 0.99;
-      popup.life--;
+      popup.y += popup.vy * dt;
+      popup.vy *= Math.pow(0.99, dt);
+      popup.life -= dt;
       if (popup.life <= 0) feedback.scorePopups.splice(i, 1);
     }
 
     for (let i = feedback.impactBursts.length - 1; i >= 0; i--) {
-      feedback.impactBursts[i].timer--;
+      feedback.impactBursts[i].timer -= dt;
       if (feedback.impactBursts[i].timer <= 0) feedback.impactBursts.splice(i, 1);
     }
   }
@@ -484,10 +485,10 @@
     feedback.roverShake = Math.max(feedback.roverShake, BAD_FEEDBACK_DURATION);
   }
 
-  function updateDamageMessage() {
+  function updateDamageMessage(dt) {
     if (damageMessageTimer <= 0) return;
-    damageMessageTimer--;
-    if (damageMessageTimer === 0) {
+    damageMessageTimer -= dt;
+    if (damageMessageTimer <= 0) {
       damageMessageEl.classList.remove('visible');
       damageMessageEl.textContent = '';
     }
@@ -714,7 +715,7 @@
     return false;
   }
 
-  function updatePlayer() {
+  function updatePlayer(dt) {
     if (keys.left) {
       player.vx = -MOVE_SPEED;
       player.facing = -1;
@@ -722,7 +723,7 @@
       player.vx = MOVE_SPEED;
       player.facing = 1;
     } else {
-      player.vx *= 0.7;
+      player.vx *= Math.pow(0.7, dt);
       if (Math.abs(player.vx) < 0.1) player.vx = 0;
     }
 
@@ -731,9 +732,10 @@
       player.onGround = false;
     }
 
-    player.vy += GRAVITY;
-    player.x += player.vx;
-    player.y += player.vy;
+    const prevY = player.y;
+    player.vy += GRAVITY * dt;
+    player.x += player.vx * dt;
+    player.y += player.vy * dt;
 
     if (player.x < 0) player.x = 0;
     if (player.x + player.w > worldWidth) player.x = worldWidth - player.w;
@@ -741,8 +743,8 @@
     player.onGround = false;
 
     for (const p of platforms) {
-      const prevBottom = player.y + player.h - player.vy;
-      const prevTop = player.y - player.vy;
+      const prevBottom = prevY + player.h;
+      const prevTop = prevY;
 
       if (rectsOverlap(player, p)) {
         if (player.vy > 0 && prevBottom <= p.y + 4) {
@@ -762,7 +764,7 @@
 
     for (const rock of mineralRocks) {
       if (rock.broken) continue;
-      const prevBottom = player.y + player.h - player.vy;
+      const prevBottom = prevY + player.h;
 
       if (rectsOverlap(player, rock)) {
         if (player.vy > 0 && prevBottom <= rock.y + 6) {
@@ -786,20 +788,21 @@
       handlePlayerDamage('crater');
     }
 
-    updateCamera();
+    updateCamera(dt);
   }
 
-  function updateCamera() {
+  function updateCamera(dt) {
     const maxCamera = Math.max(0, worldWidth - canvas.width);
     const target = player.x - canvas.width * CAMERA_LEAD;
     const desired = Math.max(0, Math.min(target, maxCamera));
-    cameraX += (desired - cameraX) * CAMERA_SMOOTH;
+    const smooth = 1 - Math.pow(1 - CAMERA_SMOOTH, dt);
+    cameraX += (desired - cameraX) * smooth;
     if (Math.abs(desired - cameraX) < 0.5) cameraX = desired;
   }
 
-  function updateAliens() {
+  function updateAliens(dt) {
     for (const alien of aliens) {
-      alien.x += alien.speed * alien.dir;
+      alien.x += alien.speed * alien.dir * dt;
       if (alien.x <= alien.minX) { alien.x = alien.minX; alien.dir = 1; }
       if (alien.x + 28 >= alien.maxX) { alien.x = alien.maxX - 28; alien.dir = -1; }
 
@@ -866,13 +869,13 @@
     };
   }
 
-  function updateAsteroids() {
+  function updateAsteroids(dt) {
     const level = LEVELS[levelIndex];
     if (!level.asteroids) return;
 
     const maxOnScreen = level.maxAsteroids ?? 1;
     if (asteroids.length < maxOnScreen) {
-      asteroidTimer++;
+      asteroidTimer += dt;
       if (asteroidTimer >= (level.asteroidRate || 120)) {
         asteroidTimer = 0;
         spawnAsteroid(level);
@@ -883,14 +886,14 @@
       const a = asteroids[i];
 
       if (a.phase === 'explode') {
-        a.explodeTimer++;
+        a.explodeTimer += dt;
         if (a.explodeTimer >= a.explodeMax) {
           asteroids.splice(i, 1);
         }
         continue;
       }
 
-      a.y += a.vy;
+      a.y += a.vy * dt;
       const bottom = a.y + a.beamH;
 
       if (bottom >= FLOOR_Y - 8) {
@@ -930,17 +933,17 @@
     }
   }
 
-  function updateMineralRocks() {
+  function updateMineralRocks(dt) {
     for (const rock of mineralRocks) {
-      if (rock.shatter > 0) rock.shatter--;
+      if (rock.shatter > 0) rock.shatter -= dt;
     }
   }
 
-  function updateCollectibles() {
-    if (pickupCooldown > 0) pickupCooldown--;
+  function updateCollectibles(dt) {
+    if (pickupCooldown > 0) pickupCooldown -= dt;
     for (const item of collectibles) {
       if (item.collected || item.hidden || pickupCooldown > 0) continue;
-      item.bob += 0.08;
+      item.bob += 0.08 * dt;
       const hitbox = { x: item.x - 8, y: item.y - 8 + Math.sin(item.bob) * 3, w: 16, h: 16 };
       if (rectsOverlap(player, hitbox)) {
         item.collected = true;
@@ -1612,38 +1615,45 @@
     ctx.restore();
   }
 
-  function update() {
+  function update(dt) {
     if (state === 'levelcomplete') {
-      updateFeedback();
+      updateFeedback(dt);
       if (levelAdvanceTimer > 0) {
-        levelAdvanceTimer--;
-        if (levelAdvanceTimer === 0) {
+        levelAdvanceTimer -= dt;
+        if (levelAdvanceTimer <= 0) {
           advanceToNextLevel();
         }
       }
-      frameCount++;
+      frameCount += dt;
       return;
     }
 
     if (state !== 'playing') return;
 
-    updatePlayer();
-    updateAliens();
-    updateAsteroids();
-    updateMineralRocks();
-    updateCollectibles();
-    updateFeedback();
+    updatePlayer(dt);
+    updateAliens(dt);
+    updateAsteroids(dt);
+    updateMineralRocks(dt);
+    updateCollectibles(dt);
+    updateFeedback(dt);
 
-    if (invincibleTimer > 0) invincibleTimer--;
-    frameCount++;
+    if (invincibleTimer > 0) invincibleTimer -= dt;
+    frameCount += dt;
   }
 
-  function gameLoop() {
-    updateDamageMessage();
-    if (state !== 'playing') {
-      updateFeedback();
+  function gameLoop(now) {
+    if (gameLoop.lastTime === undefined) {
+      gameLoop.lastTime = now;
     }
-    update();
+    const elapsed = Math.min(now - gameLoop.lastTime, 100);
+    gameLoop.lastTime = now;
+    const dt = elapsed / TARGET_FRAME_MS;
+
+    updateDamageMessage(dt);
+    if (state !== 'playing') {
+      updateFeedback(dt);
+    }
+    update(dt);
     render();
     requestAnimationFrame(gameLoop);
   }

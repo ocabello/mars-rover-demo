@@ -108,7 +108,7 @@ const GameAudio = (function () {
       console.warn(`[Ark-3] Unknown sound key: ${key}`);
       return;
     }
-    const audio = applyMuteState(new Audio(src));
+    const audio = new Audio(src);
     audio.volume = 1;
     audio.play().catch((err) => {
       console.warn(`[Ark-3] Could not play "${key}" (${src}):`, err.message);

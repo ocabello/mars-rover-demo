@@ -14,20 +14,30 @@
     if (!frame) return;
     const availW = frame.clientWidth;
     if (availW <= 0) return;
-    // Never upscale past native 800×480 — keeps pixels crisp; shrink only on narrow viewports.
     const scale = Math.min(1, availW / GAME_WIDTH);
-    canvas.style.width = `${Math.floor(GAME_WIDTH * scale)}px`;
-    canvas.style.height = `${Math.floor(GAME_HEIGHT * scale)}px`;
+    const w = Math.floor(GAME_WIDTH * scale);
+    const h = Math.floor(GAME_HEIGHT * scale);
+    if (canvas.style.width === `${w}px` && canvas.style.height === `${h}px`) return;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+  }
+
+  let fitCanvasScheduled = false;
+  function scheduleFitCanvasDisplay() {
+    if (fitCanvasScheduled) return;
+    fitCanvasScheduled = true;
+    requestAnimationFrame(() => {
+      fitCanvasScheduled = false;
+      fitCanvasDisplay();
+    });
   }
 
   const frameEl = canvas.closest('.game-frame');
   if (frameEl) {
     fitCanvasDisplay();
-    new ResizeObserver(fitCanvasDisplay).observe(frameEl);
-    window.addEventListener('resize', fitCanvasDisplay);
-    document.addEventListener('ark3:start-game', () => {
-      requestAnimationFrame(fitCanvasDisplay);
-    });
+    new ResizeObserver(scheduleFitCanvasDisplay).observe(frameEl);
+    window.addEventListener('resize', scheduleFitCanvasDisplay);
+    document.addEventListener('ark3:start-game', scheduleFitCanvasDisplay);
   }
   const overlay = document.getElementById('overlay');
   const overlayContent = document.getElementById('overlay-content');
@@ -1659,6 +1669,9 @@
   document.getElementById('game-container').addEventListener('click', focusGame);
 
   function initGameEngine() {
+    if (initGameEngine.started) return;
+    initGameEngine.started = true;
+    GameAudio.unlock();
     GameAssets.loadAll()
       .then(() => {
         gameLoop();

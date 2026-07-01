@@ -162,6 +162,7 @@
 
   function launchGame() {
     stopMedia();
+    GameAudio.unlock();
     GameAudio.stopIntroLoop();
     introApp.hidden = true;
     gameContainer.hidden = false;

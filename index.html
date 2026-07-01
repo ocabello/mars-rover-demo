@@ -3,47 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mars Rover — Save the Earth</title>
+  <title>Project Ark-3</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="game-container">
+  <!-- Human verification intro (screens 1–3) -->
+  <div id="intro-app" class="intro-app">
+    <section id="connect-screen" class="screen is-active">
+      <div class="intro-card">
+        <p class="intro-kicker">Mission briefing</p>
+        <h1 class="intro-title">Project Ark-3</h1>
+        <h2 class="intro-heading">Prove you're human</h2>
+        <p class="intro-story">
+          Earth needs the Ark-3 rover to gather life-saving elements from Mars.
+          Before you take the controls, mission control must confirm you are a real
+          human pilot — not an AI infiltrator.
+        </p>
+        <p class="intro-story">
+          When the camera opens, <strong>wave</strong> at the lens and say
+          <strong>“pew pew”</strong> like a cosmic ray-gun. Two beats. Loud and clear.
+        </p>
+
+        <button id="connect-btn" type="button" class="intro-btn">Connect camera &amp; microphone</button>
+        <p id="connect-status" class="connect-status" role="status"></p>
+      </div>
+    </section>
+
+    <section id="preview-screen" class="screen">
+      <div class="preview-space" aria-hidden="true"></div>
+      <h2 class="preview-heading">Wave and say &ldquo;pew pew&rdquo;</h2>
+      <div class="portal-frame">
+        <video id="camera-preview" class="portal-video" autoplay playsinline muted></video>
+        <canvas id="motion-canvas" class="motion-canvas" aria-hidden="true"></canvas>
+      </div>
+      <ul id="verification-checklist" class="verification-checklist">
+        <li id="check-wave" class="check-badge" role="status">Wave detected</li>
+        <li id="check-pew" class="check-badge" role="status">Pew pew detected</li>
+      </ul>
+      <p id="pew-feedback" class="pew-feedback" hidden role="alert">Speak louder, pilot!</p>
+    </section>
+
+    <section id="approved-screen" class="screen">
+      <div class="intro-card approved-card">
+        <p class="intro-kicker">Verification complete</p>
+        <h1 class="intro-title">Project Ark-3</h1>
+        <h2 class="intro-heading approved-heading">Human approved</h2>
+        <p class="intro-story">
+          Somewhere in the dust lie <strong>good cells</strong>, <strong>gems</strong>,
+          and <strong>water droplets</strong>: the last pieces of a world worth saving.
+          The red planet does not surrender them willingly.
+        </p>
+        <p class="intro-story">
+          Your mission: bring these items back to Earth.
+        </p>
+        <p class="intro-story intro-story-emphasis">
+          Pilot, you're all we have left.
+        </p>
+        <button id="start-game-btn" type="button" class="intro-btn">START MISSION</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Mars rover game (screen 4 — after human check) -->
+  <div id="game-container" hidden>
     <header id="hud">
       <div class="hud-section">
         <span class="hud-label">LIVES</span>
-        <span id="lives-display">♥ ♥ ♥</span>
+        <span id="lives-display">♥ ♥ ♥ ♥ ♥</span>
       </div>
       <div class="hud-section">
         <span class="hud-label">LEVEL</span>
         <span id="level-display">1</span>
       </div>
+      <div class="hud-section">
+        <span id="score-display">Score: 0</span>
+      </div>
       <div class="hud-section collectibles">
-        <span class="collect-item" title="Minerals">⛏ <span id="minerals-count">0</span>/<span id="minerals-goal">3</span></span>
-        <span class="collect-item" title="Microbes">🦠 <span id="microbes-count">0</span>/<span id="microbes-goal">0</span></span>
-        <span class="collect-item" title="Water">💧 <span id="water-count">0</span>/<span id="water-goal">0</span></span>
+        <span class="collect-item" title="Good Cells">
+          <img class="hud-icon" id="hud-icon-cell" src="assets/good-cell.png" alt="">
+          <span id="good-cells-count">0</span>/<span id="good-cells-goal">1</span>
+        </span>
+        <span class="collect-item" title="Gems">
+          <img class="hud-icon" id="hud-icon-gem" src="assets/gem.png" alt="">
+          <span id="gems-count">0</span>/<span id="gems-goal">1</span>
+        </span>
+        <span class="collect-item" title="Water Droplets">
+          <img class="hud-icon" id="hud-icon-water" src="assets/water.png" alt="">
+          <span id="water-count">0</span>/<span id="water-goal">1</span>
+        </span>
       </div>
     </header>
 
-    <canvas id="game-canvas" width="800" height="480"></canvas>
+    <canvas id="game-canvas" width="800" height="480" tabindex="0" aria-label="Project Ark-3 rover game"></canvas>
 
-    <div id="overlay" class="overlay visible">
-      <div id="overlay-content">
-        <h1>MARS ROVER</h1>
-        <p class="subtitle">Collect elements. Save the Earth.</p>
-        <p class="story">
-          You're a Mars rover on the red planet. Gather <strong>minerals</strong>,
-          <strong>microbes</strong>, and <strong>water</strong> to bring back to Earth —
-          but watch out for craters, hostile aliens, and falling asteroids!
-        </p>
-        <div class="controls-hint">
-          <kbd>←</kbd> <kbd>→</kbd> Move &nbsp;·&nbsp; <kbd>↑</kbd> or <kbd>Space</kbd> Jump
-        </div>
-        <button id="start-btn" class="game-btn">START MISSION</button>
-      </div>
+    <div id="damage-message" class="damage-message" aria-live="assertive"></div>
+
+    <div id="overlay" class="overlay">
+      <div id="overlay-content"></div>
     </div>
   </div>
 
-  <script src="levels.js"></script>
-  <script src="game.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="input-detection-service.js?v=20260630-detection"></script>
+  <script src="sounds.js?v=20260630-recover-terrain"></script>
+  <script src="app.js?v=20260630-detection"></script>
+  <script src="assets.js?v=20260701-asteroid-beam-v4"></script>
+  <script src="levels.js?v=20260701-crater-v2"></script>
+  <script src="game.js?v=20260701-asteroid-beam-v4"></script>
 </body>
 </html>

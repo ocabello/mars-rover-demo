@@ -1,36 +1,30 @@
-# Mars Rover — Save the Earth
+# Project Ark-3
 
-A browser-based platformer where you pilot a Mars rover to collect minerals, microbes, and water while avoiding craters, hostile aliens, and falling asteroids.
+A browser-based Mars rover platformer with a **human verification intro** (wave + “pew pew” via camera/mic) before gameplay.
 
-## How to Play
-
-Open `index.html` in a web browser (or serve locally):
+## Quick start
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then visit [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:8080](http://localhost:8080) — **required** for camera/mic access.
 
-### Controls
+1. Complete the human check (connect → wave → pew pew → approved)
+2. Click **START MISSION** to begin the rover game
+3. Collect good cells, gems, and water droplets; avoid craters, aliens, and asteroids
+
+See **INSTRUCTIONS.md** for full setup, troubleshooting, and file structure.
+
+## Controls
 
 | Key | Action |
 |-----|--------|
 | ← → | Move left / right |
 | ↑ or Space | Jump |
 
-### Goal
-
-Collect the required number of **minerals**, **microbes**, and **water** shown in the HUD to clear each level. You have **3 lives** — fall into a crater, touch an alien, or get hit by an asteroid and you lose one.
-
-### Levels
-
-1. **Dusty Plains** — Learn the basics; collect minerals, avoid craters
-2. **Microbe Valley** — Aliens appear; collect minerals and microbes
-3. **Ice Cap Search** — Water introduced; more craters and faster aliens
-4. **Asteroid Storm** — Falling asteroids join the fight
-5. **Final Frontier** — Everything at max difficulty
+You have **3 lives**. Clear all 10 levels to save Earth.
 
 ## Tech
 
-Vanilla HTML5 Canvas — no build step required.
+Vanilla HTML, CSS, and JavaScript — no build step required.

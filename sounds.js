@@ -45,6 +45,17 @@ const GameAudio = (function () {
     });
   }
 
+  function bootstrapIntro() {
+    const audio = ensureIntroAudio();
+    audio.muted = false;
+    audio.play().then(() => {
+      unlocked = true;
+    }).catch(() => {
+      applyMuteState(audio);
+      bindInteractionUnlock();
+    });
+  }
+
   function ensureIntroAudio() {
     if (!introAudio) {
       introAudio = new Audio(SOUNDS.intro);
@@ -116,7 +127,7 @@ const GameAudio = (function () {
     });
   }
 
-  bindInteractionUnlock();
+  bootstrapIntro();
   preload();
 
   return {

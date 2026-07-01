@@ -75,18 +75,20 @@
   <div id="game-container" hidden>
     <div class="game-frame">
       <header id="hud">
-        <div class="hud-section">
+        <div class="hud-section hud-left">
           <span class="hud-label">LIVES</span>
           <span id="lives-display">♥ ♥ ♥ ♥ ♥</span>
         </div>
-        <div class="hud-section">
-          <span class="hud-label">LEVEL</span>
-          <span id="level-display">1</span>
+        <div class="hud-center">
+          <div class="hud-section">
+            <span class="hud-label">LEVEL</span>
+            <span id="level-display">1</span>
+          </div>
+          <div class="hud-section">
+            <span id="score-display">Score: 0</span>
+          </div>
         </div>
-        <div class="hud-section">
-          <span id="score-display">Score: 0</span>
-        </div>
-        <div class="hud-section collectibles">
+        <div class="hud-section collectibles hud-right">
           <span class="collect-item" title="Good Cells">
             <img class="hud-icon" id="hud-icon-cell" src="assets/good-cell.png" alt="">
             <span id="good-cells-count">0</span>/<span id="good-cells-goal">1</span>

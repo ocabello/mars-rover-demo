@@ -10,20 +10,20 @@
   ctx.imageSmoothingEnabled = false;
 
   function fitCanvasDisplay() {
-    const stage = canvas.closest('.game-stage');
-    if (!stage) return;
-    const availW = stage.clientWidth;
-    const availH = stage.clientHeight;
-    if (availW <= 0 || availH <= 0) return;
-    const scale = Math.min(availW / GAME_WIDTH, availH / GAME_HEIGHT);
+    const frame = canvas.closest('.game-frame');
+    if (!frame) return;
+    const availW = frame.clientWidth;
+    if (availW <= 0) return;
+    // Never upscale past native 800×480 — keeps pixels crisp; shrink only on narrow viewports.
+    const scale = Math.min(1, availW / GAME_WIDTH);
     canvas.style.width = `${Math.floor(GAME_WIDTH * scale)}px`;
     canvas.style.height = `${Math.floor(GAME_HEIGHT * scale)}px`;
   }
 
-  const stageEl = canvas.closest('.game-stage');
-  if (stageEl) {
+  const frameEl = canvas.closest('.game-frame');
+  if (frameEl) {
     fitCanvasDisplay();
-    new ResizeObserver(fitCanvasDisplay).observe(stageEl);
+    new ResizeObserver(fitCanvasDisplay).observe(frameEl);
     window.addEventListener('resize', fitCanvasDisplay);
     document.addEventListener('ark3:start-game', () => {
       requestAnimationFrame(fitCanvasDisplay);

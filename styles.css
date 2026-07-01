@@ -328,19 +328,25 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.game-frame {
+  position: relative;
+  width: 800px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
   border: 4px solid #444;
   box-shadow: 0 0 40px rgba(200, 80, 40, 0.3);
 }
 
 .game-stage {
-  flex: 1 1 auto;
-  min-height: 0;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 0;
   background: #2a0e42;
 }
 
@@ -356,17 +362,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
   background: #1a1a2e;
   color: #e0e0e0;
   padding: 10px 16px;
   font-size: 10px;
   border-bottom: 3px solid #333;
+  gap: 12px;
 }
 
 .hud-section {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .hud-label {
@@ -395,7 +407,8 @@ body {
 }
 
 .collectibles {
-  gap: 16px;
+  gap: 12px;
+  margin-left: auto;
 }
 
 .collect-item {
@@ -416,11 +429,9 @@ body {
 
 #game-canvas {
   display: block;
-  flex: 0 0 auto;
   width: 800px;
   height: 480px;
   max-width: 100%;
-  max-height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   outline: none;

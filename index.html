@@ -73,42 +73,44 @@
 
   <!-- Mars rover game (screen 4 — after human check) -->
   <div id="game-container" hidden>
-    <header id="hud">
-      <div class="hud-section">
-        <span class="hud-label">LIVES</span>
-        <span id="lives-display">♥ ♥ ♥ ♥ ♥</span>
-      </div>
-      <div class="hud-section">
-        <span class="hud-label">LEVEL</span>
-        <span id="level-display">1</span>
-      </div>
-      <div class="hud-section">
-        <span id="score-display">Score: 0</span>
-      </div>
-      <div class="hud-section collectibles">
-        <span class="collect-item" title="Good Cells">
-          <img class="hud-icon" id="hud-icon-cell" src="assets/good-cell.png" alt="">
-          <span id="good-cells-count">0</span>/<span id="good-cells-goal">1</span>
-        </span>
-        <span class="collect-item" title="Gems">
-          <img class="hud-icon" id="hud-icon-gem" src="assets/gem.png" alt="">
-          <span id="gems-count">0</span>/<span id="gems-goal">1</span>
-        </span>
-        <span class="collect-item" title="Water Droplets">
-          <img class="hud-icon" id="hud-icon-water" src="assets/water.png" alt="">
-          <span id="water-count">0</span>/<span id="water-goal">1</span>
-        </span>
-      </div>
-    </header>
+    <div class="game-frame">
+      <header id="hud">
+        <div class="hud-section">
+          <span class="hud-label">LIVES</span>
+          <span id="lives-display">♥ ♥ ♥ ♥ ♥</span>
+        </div>
+        <div class="hud-section">
+          <span class="hud-label">LEVEL</span>
+          <span id="level-display">1</span>
+        </div>
+        <div class="hud-section">
+          <span id="score-display">Score: 0</span>
+        </div>
+        <div class="hud-section collectibles">
+          <span class="collect-item" title="Good Cells">
+            <img class="hud-icon" id="hud-icon-cell" src="assets/good-cell.png" alt="">
+            <span id="good-cells-count">0</span>/<span id="good-cells-goal">1</span>
+          </span>
+          <span class="collect-item" title="Gems">
+            <img class="hud-icon" id="hud-icon-gem" src="assets/gem.png" alt="">
+            <span id="gems-count">0</span>/<span id="gems-goal">1</span>
+          </span>
+          <span class="collect-item" title="Water Droplets">
+            <img class="hud-icon" id="hud-icon-water" src="assets/water.png" alt="">
+            <span id="water-count">0</span>/<span id="water-goal">1</span>
+          </span>
+        </div>
+      </header>
 
-    <div class="game-stage">
-      <canvas id="game-canvas" width="800" height="480" tabindex="0" aria-label="Project Ark-3 rover game"></canvas>
-    </div>
+      <div class="game-stage">
+        <canvas id="game-canvas" width="800" height="480" tabindex="0" aria-label="Project Ark-3 rover game"></canvas>
+      </div>
 
-    <div id="damage-message" class="damage-message" aria-live="assertive"></div>
+      <div id="damage-message" class="damage-message" aria-live="assertive"></div>
 
-    <div id="overlay" class="overlay">
-      <div id="overlay-content"></div>
+      <div id="overlay" class="overlay">
+        <div id="overlay-content"></div>
+      </div>
     </div>
   </div>
 
